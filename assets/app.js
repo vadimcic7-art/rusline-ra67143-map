@@ -21,6 +21,7 @@
     SKX: {airline:"Россия", airports:"SVO", frequency:"6 вылетов 16–21.11", scope:"часть недели; 22.11 не проверено"},
     PEZ: {airline:"Россия", airports:"SVO", frequency:"6 вылетов 16–21.11", scope:"часть недели; 22.11 не проверено"},
   };
+  const moscowAirportNames = {VKO:"Внуково (VKO)",SVO:"Шереметьево (SVO)",DME:"Домодедово (DME)",ZIA:"Жуковский (ZIA)"};
   let map, layerGroup, activeLine, planeMarker, animationFrame, animationStart;
 
   function esc(value) {
@@ -44,10 +45,13 @@
   }
   function routeByCode(code) { return routes.find(r => r.iata === code); }
   function status(r) {
-    if (r.primaryScope === "carrier_program_partial_week") return {label:"Частичная первичная проверка", className:"partial"};
-    if (r.primaryScope === "not_rechecked_primary") return {label:"Первично не перепроверено", className:"unchecked"};
-    return {label:"Первичная программа проверена", className:""};
+    if (r.primaryScope === "carrier_program_partial_week") return {label:"Часть недели проверена", className:"partial"};
+    if (r.primaryScope === "not_rechecked_primary") return {label:"Конкуренция не перепроверена", className:"unchecked"};
+    if (r.primaryScope === "destination_airport_schedule") return {label:"Расписание аэропорта проверено", className:""};
+    if (r.primaryScope === "carrier_program_lower_bound") return {label:"Проверена часть предложения", className:"partial"};
+    return {label:"Программа перевозчика проверена", className:""};
   }
+  function airportNames(codes) { return codes.split(/[,/]+/).map(code => moscowAirportNames[code.trim()] || code.trim()).join(", "); }
   function vkoLabel(r) {
     const checked = checkedMarket[r.iata];
     if (checked?.vko != null) return `${checked.vko} рейс${checked.vko === 3 ? "а" : "ов"}/нед · проверено`;
@@ -58,13 +62,14 @@
     const checked = checkedMarket[r.iata];
     const airlines = r.oldAirlines && !r.oldAirlines.startsWith("Не установлены") ? r.oldAirlines : "не установлены";
     const airports = r.oldMoscowAirports && !r.oldMoscowAirports.startsWith("Не подтверждены") ? r.oldMoscowAirports : "не подтверждены";
-    const checkedRow = checked ? `<div class="market-row"><div><span>Авиакомпания</span><strong>${esc(checked.airline)}</strong></div><div><span>Аэропорт Москвы</span><strong>${esc(checked.airports)}</strong></div><div><span>Частота</span><strong>${esc(checked.frequency)}</strong></div><div><span>Статус данных</span><strong>${esc(checked.scope)}</strong></div></div>` : `<p class="market-missing">Первичная проверка перевозчика и частоты для контрольной недели ещё не проведена.</p>`;
+    const checkedRow = checked ? `<div class="market-row"><div><span>Авиакомпания</span><strong>${esc(checked.airline)}</strong></div><div><span>Аэропорт Москвы</span><strong>${esc(airportNames(checked.airports))}</strong></div><div><span>Частота</span><strong>${esc(checked.frequency)}</strong></div><div><span>Статус данных</span><strong>${esc(checked.scope)}</strong></div></div>` : `<p class="market-missing">Первичная проверка перевозчика и частоты для контрольной недели ещё не проведена.</p>`;
     const vkoClass = checked?.vko != null ? "yes" : r.vkoWeekOld > 0 ? "old" : "unknown";
     return `<section class="market-summary" aria-label="Конкуренция из аэропортов Москвы">
       <h4>Кто летает из Москвы</h4>
       <div class="market-highlights"><div><span>Проверенная программа</span><strong>${checked ? esc(checked.frequency) : "нет данных"}</strong></div><div><span>Внуково (VKO)</span><strong class="vko-state ${vkoClass}">${esc(vkoLabel(r))}</strong></div></div>
       ${checkedRow}
       <div class="market-archive"><b>Срез 07.10:</b> ${esc(airlines)} · ${esc(airports)} · Москва ${fmt(r.moscowWeekOld)}/нед · VKO ${fmt(r.vkoWeekOld)}/нед. Частота по каждому перевозчику и аэропорту в этом срезе не разложена.</div>
+      ${r.primaryNote ? `<p class="market-note">Проверка 19.10: ${esc(r.primaryNote)}</p>` : ""}
       ${checked && checked.vko == null ? `<p class="market-caution">В проверенной программе рейс из VKO не найден. Это не доказывает отсутствие других рейсов из Внуково.</p>` : ""}
       ${r.primarySource?.startsWith("https://") ? `<a class="evidence-link" href="${esc(r.primarySource)}" target="_blank" rel="noopener noreferrer">Источник проверенной программы ↗</a>` : ""}
     </section>`;
@@ -77,23 +82,18 @@
   function pair(label, value) { return `<div class="small-data"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`; }
   function renderDetail(r) {
     const s = status(r);
-    const evidence = r.primaryScope === "not_rechecked_primary" ? "Первичной перепроверки программы нет" : r.primaryScope === "carrier_program_partial_week" ? `${r.primaryObservedCount} вылетов за проверенные даты 16–21.11` : `${fmt(r.primaryWeek)} вылетов/нед в проверенной программе`;
-    const sourceLink = r.primarySource?.startsWith("https://") ? `<a class="evidence-link" href="${esc(r.primarySource)}" target="_blank" rel="noopener noreferrer">Открыть первичный источник ↗</a>` : "";
     detail.innerHTML = `
       <div class="detail-top"><span class="detail-kicker">КАНДИДАТ № ${String(r.rank).padStart(2,"0")} / VKO → ${esc(r.iata)}</span><div class="detail-title"><h3>${esc(r.city)}</h3><span class="iata-pill">${esc(r.iata)}</span></div><div class="detail-subtitle">${esc(r.airport)} · ${esc(r.region)}</div><span class="status-pill ${s.className}">${s.label}</span></div>
       ${renderCompetition(r)}
       <div class="detail-core"><div class="metric-grid">
         ${metric(fmt(r.opportunity),"Opportunity Score","старый балл · 07.10")}
         ${metric(fmt(r.aircraftFit),"Aircraft Fit Score","старый балл · 07.10")}
-        ${metric(fmt(r.moscowWeekOld),"Москва / нед","старый срез · все аэропорты")}
-        ${metric(fmt(r.vkoWeekOld),"Внуково / нед","старый срез")}
         ${metric(hours(airborneMinutes(r.estimatedOutMin)),"в воздухе из VKO","оценка · без 25 мин наземного этапа")}
         ${metric(hours(airborneMinutes(r.estimatedBackMin)),"в воздухе в VKO","оценка · без 25 мин наземного этапа")}
         ${metric(hours(r.estimatedRotationMin),"оборот VKO–X–VKO","старая оценка")}
         ${metric(`${r.timeOnlyWindowFits}/5`,"окон подходят по времени","OPS не проверено",true)}
       </div></div>
       <div class="detail-section"><h4>Рейсы из Москвы по дням</h4><div class="weekly">${days.map((day,i) => `<div class="day ${r.moscowDailyOld[i] === 0 ? "zero" : ""}"><span class="day-label">${day}</span><span class="day-number">${fmt(r.moscowDailyOld[i])}</span></div>`).join("")}</div><p class="weekly-note">Исторический недельный срез 07.10.2026 для 16–22.11.2026; полнота и изменения требуют проверки.</p></div>
-      <div class="detail-section"><h4>Перепроверка 19.10</h4><strong class="evidence-count">${esc(evidence)}</strong><p>${esc(r.primaryNote || "Частота по официальному расписанию для этой недели ещё не перепроверена.")}</p>${sourceLink}</div>
       <div class="detail-section"><h4>Допустимый вылет из VKO · МСК</h4><div class="fit-rows">${r.windowFit.map((w,i)=>`<div class="fit-row"><b>${days[i]}</b><span>${compact(w.earliestDeparture)}–${compact(w.latestDeparture)}</span><strong>${fmt(w.departureRangeMin)} мин</strong></div>`).join("")}</div><p class="weekly-note">Диапазоны рассчитаны по старой оценке оборота и буферам 60/120 минут. Не подтверждают режим аэропорта, слоты и экипаж.</p></div>
       <div class="detail-section"><h4>Что показывает модель</h4><p>${esc(r.oldWhy || "Кандидат старого исследования; причина выбора требует дополнительной рыночной оценки.")}</p>${pair("Баллы старого рейтинга",fmt(r.combined))}${pair("Самый узкий диапазон вылета",`${fmt(r.narrowestDepartureRangeMin)} мин`)}</div>
       <button class="detail-more" type="button" aria-expanded="false" aria-controls="detail-expanded">Все исходные показатели и риски ↓</button>
