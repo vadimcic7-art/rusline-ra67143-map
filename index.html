@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141b2b">
+  <meta name="description" content="Интерактивная карта 20 направлений-кандидатов для RA-67143 из Внуково. Анализ недели 16–22 ноября 2026 года.">
+  <title>РусЛайн · Карта направлений RA-67143</title>
+  <link rel="stylesheet" href="assets/vendor/leaflet.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/vendor/leaflet.js"></script>
+  <script src="assets/data.js"></script>
+  <script src="assets/basemap.js"></script>
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="РусЛайн — к началу страницы"><span class="brand-mark">RL<span class="brand-mark-wing"></span></span><span>РУС<span>ЛАЙН</span></span></a>
+      <div class="topbar-meta"><span class="live-dot" aria-hidden="true"></span> Аналитическая карта <span class="meta-separator">/</span> RA-67143 <span class="meta-separator">/</span> зима 2026/27</div>
+      <a class="topbar-link" href="#method">Данные и ограничения <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="main-title">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="eyebrow-line"></span> НАВИГАЦИЯ ПО ВОЗМОЖНОСТЯМ</span>
+          <h1 id="main-title">Куда может полететь<br><em>RA-67143</em> из Внуково</h1>
+          <p>20 направлений-кандидатов на контрольную неделю 16–22 ноября 2026 года. Выберите город на карте, чтобы сравнить конкуренцию, временную совместимость с СПП и качество данных.</p>
+          <div class="hero-disclaimer"><span class="caution-icon" aria-hidden="true">!</span><span>Это предварительный скрининг. Ни один маршрут пока не признан прибыльным или согласованным к выполнению.</span></div>
+        </div>
+        <div class="hero-art" aria-label="Стилизованный CRJ RA-67143 с белым фюзеляжем и красно-золотыми элементами">
+          <div class="art-orbit art-orbit-1"></div><div class="art-orbit art-orbit-2"></div>
+          <span class="art-coordinate art-coordinate-top">55°35′ N &nbsp; 37°15′ E</span>
+          <img src="assets/rusline-crj.svg" alt="Стилизованный CRJ RA-67143: белый фюзеляж, красная надпись RusLine и красно-золотой хвост">
+          <span class="art-caption">RA-67143 <b>·</b> CRJ-100ER <b>·</b> VKO</span>
+        </div>
+      </section>
+
+      <section class="overview" aria-label="Сводные показатели">
+        <div class="overview-item"><span class="overview-number">20</span><span class="overview-label">кандидатов<br>в исходном TOP-20</span></div>
+        <div class="overview-item"><span class="overview-number">5</span><span class="overview-label">повторяющихся окон<br>борта во Внуково</span></div>
+        <div class="overview-item"><span class="overview-number">10<span class="overview-sup">/20</span></span><span class="overview-label">первичных перепроверок<br>включая 2 неполные недели</span></div>
+        <div class="overview-item overview-alert"><span class="overview-number">0</span><span class="overview-label">подтверждённых<br>прибыльных маршрутов</span></div>
+      </section>
+
+      <section class="explorer" aria-labelledby="explorer-title">
+        <div class="section-heading"><div><span class="eyebrow">МАРШРУТНАЯ СЕТКА</span><h2 id="explorer-title">Исследуйте направления</h2></div><span class="section-hint">VKO → аэропорт назначения · линии показывают направление, а не опубликованные рейсы</span></div>
+        <div class="explorer-layout">
+          <aside class="list-panel" aria-label="Список направлений">
+            <div class="list-controls">
+              <label class="search-box"><span aria-hidden="true">⌕</span><input id="route-search" type="search" placeholder="Город или код аэропорта" autocomplete="off" aria-label="Поиск города или кода аэропорта"></label>
+              <div class="filter-row" role="group" aria-label="Показать кандидатов"><button class="filter-chip is-active" type="button" data-limit="5">TOP-5</button><button class="filter-chip" type="button" data-limit="10">TOP-10</button><button class="filter-chip" type="button" data-limit="20">Все 20</button></div>
+              <label class="sort-label">Сортировать <select id="route-sort"><option value="rank">По прежнему рейтингу</option><option value="opportunity">Opportunity Score</option><option value="fit">Aircraft Fit Score</option><option value="moscow">Меньше рейсов из Москвы</option><option value="rotation">Короче оборот</option></select></label>
+            </div>
+            <div id="route-list" class="route-list" aria-live="polite"></div>
+            <div class="list-footer"><span id="visible-count">Показано 5 из 20</span></div>
+          </aside>
+
+          <div class="map-panel">
+            <div id="map" role="application" aria-label="Интерактивная карта кандидатов из Внуково"></div>
+            <div id="map-fallback" class="map-fallback" hidden>Не удалось загрузить картографическую библиотеку. Список и показатели направлений доступны слева и ниже.</div>
+            <div class="map-head"><span class="map-head-label"><span class="map-head-pulse"></span> АЭРОПОРТ БАЗИРОВАНИЯ <b>VKO</b></span><button id="fit-map" type="button" aria-label="Показать все видимые направления">Показать все ↗</button></div>
+            <div class="map-legend"><span><i class="legend-dot legend-top"></i> TOP-5</span><span><i class="legend-dot legend-other"></i> остальные кандидаты</span><span><i class="legend-line"></i> линия сценария</span></div>
+          </div>
+
+          <aside class="detail-panel" id="detail-panel" aria-label="Показатели выбранного направления">
+            <div id="route-detail"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="method" id="method" aria-labelledby="method-title">
+        <div class="section-heading"><div><span class="eyebrow">КАК ЧИТАТЬ КАРТУ</span><h2 id="method-title">Окна и статус данных</h2></div></div>
+        <div class="method-grid">
+          <div class="method-card"><span class="method-index">01 / СПП</span><h3>Реальные окна RA-67143</h3><p>В СПП время UTC; здесь окна показаны по Москве. Для оборотов зарезервировано 60 минут после прилёта базового рейса и 120 минут до следующего вылета.</p><div class="windows" id="windows"></div></div>
+          <div class="method-card"><span class="method-index">02 / РЫНОК</span><h3>Конкуренция требует сверки</h3><p>Баллы, общие частоты Москвы и разбивка по дням взяты из исследования 07.10.2026. Рядом с направлением показана отдельная первичная перепроверка на 19.10.2026. Частичная проверка не заменяет полный недельный итог.</p></div>
+          <div class="method-card"><span class="method-index">03 / РЕШЕНИЕ</span><h3>Нужен операционный и финансовый расчёт</h3><p>Пять из пяти окон означает только геометрическую совместимость со старой оценкой оборота. Для реальной программы нужны block time, режим аэропорта, обслуживание, экипаж, ТО и слоты. Для прибыли — внутренние тарифы, загрузка и расходы.</p></div>
+        </div>
+        <p class="source-line">Координаты: <a href="https://ourairports.com/data/" target="_blank" rel="noopener">OurAirports</a> (public domain, срез 19.10.2026). Контуры стран: <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener">Natural Earth</a> (public domain, обзорный масштаб). Иллюстрация ориентируется на <a href="https://www.rusline.aero/about/flot/" target="_blank" rel="noopener">флот RusLine</a> и <a href="https://www.aviapages.ru/news/293507news-" target="_blank" rel="noopener">фото RA-67143</a>, но остаётся авторской стилизацией, не техническим чертежом и не официальным бренд-материалом.</p>
+      </section>
+    </main>
+    <footer class="footer"><span>РУСЛАЙН / АНАЛИТИЧЕСКИЙ МАКЕТ</span><span>Контрольная неделя 16–22.11.2026 · данные проверены 19.10.2026</span></footer>
+  </div>
+</body>
+</html>
