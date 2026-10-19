@@ -7,3 +7,4 @@
 .map-panel,.map-fallback{background:#e5eef0}.map-panel #map{filter:none}
 .empty-list{padding:20px;color:#88919c;font-size:12px}
 .fit-rows{display:grid;gap:5px}.fit-row{display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:5px;border-bottom:1px solid #f0f1f1;padding:3px 0;color:#697382;font-size:9px}.fit-row b{color:#b1213d}.fit-row strong{color:#394758;font-weight:800}.fit-row span{white-space:nowrap}
+.route-time{display:block;margin-top:3px;color:#9f1734;font-size:10px;font-weight:700;white-space:nowrap}

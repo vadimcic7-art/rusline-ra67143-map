@@ -15,6 +15,7 @@
   }
   function fmt(value, suffix = "") { return value == null || value === "" ? "—" : number.format(value) + suffix; }
   function hours(minutes) { return minutes == null ? "—" : `${Math.floor(minutes / 60)} ч ${String(minutes % 60).padStart(2,"0")} мин`; }
+  function airborneMinutes(planningMinutes) { return planningMinutes == null ? null : Math.max(0, planningMinutes - 25); }
   function compact(iso) { return `${iso.slice(8,10)}.${iso.slice(5,7)} ${iso.slice(11,16)}`; }
   function visibleRoutes() {
     const q = state.search.trim().toLocaleLowerCase("ru");
@@ -35,7 +36,7 @@
     return {label:"Первичная программа проверена", className:""};
   }
   function renderList(rows) {
-    routeList.innerHTML = rows.length ? rows.map(r => `<button type="button" class="route-item ${r.iata === state.selected ? "is-selected" : ""}" data-code="${esc(r.iata)}" aria-pressed="${r.iata === state.selected}"><span class="route-rank">${String(r.rank).padStart(2,"0")}</span><span><span class="route-name">${esc(r.city)}</span><span class="route-sub">${esc(r.iata)} · ${r.primaryScope === "not_rechecked_primary" ? "ожидает проверки" : r.primaryScope === "carrier_program_partial_week" ? "проверено частично" : "перепроверено"}</span></span><span><span class="route-score">${fmt(r.combined)}</span><span class="route-score-label">старый балл</span></span></button>`).join("") : `<p class="empty-list">Ничего не найдено. Попробуйте другой город или код.</p>`;
+    routeList.innerHTML = rows.length ? rows.map(r => `<button type="button" class="route-item ${r.iata === state.selected ? "is-selected" : ""}" data-code="${esc(r.iata)}" aria-pressed="${r.iata === state.selected}"><span class="route-rank">${String(r.rank).padStart(2,"0")}</span><span><span class="route-name">${esc(r.city)}</span><span class="route-sub">${esc(r.iata)} · ${r.primaryScope === "not_rechecked_primary" ? "ожидает проверки" : r.primaryScope === "carrier_program_partial_week" ? "проверено частично" : "перепроверено"}</span><span class="route-time">≈ ${hours(airborneMinutes(r.estimatedOutMin))} из VKO</span></span><span><span class="route-score">${fmt(r.combined)}</span><span class="route-score-label">старый балл</span></span></button>`).join("") : `<p class="empty-list">Ничего не найдено. Попробуйте другой город или код.</p>`;
     document.getElementById("visible-count").textContent = `Показано ${rows.length} из 20`;
   }
   function metric(value, label, note = "", red = false) { return `<div class="metric"><span class="metric-value${red ? " red" : ""}">${esc(value)}</span><span class="metric-label">${esc(label)}</span>${note ? `<span class="metric-note">${esc(note)}</span>` : ""}</div>`; }
@@ -51,6 +52,8 @@
         ${metric(fmt(r.aircraftFit),"Aircraft Fit Score","старый балл · 07.10")}
         ${metric(fmt(r.moscowWeekOld),"Москва / нед","старый срез · все аэропорты")}
         ${metric(fmt(r.vkoWeekOld),"Внуково / нед","старый срез")}
+        ${metric(hours(airborneMinutes(r.estimatedOutMin)),"в воздухе из VKO","оценка · без 25 мин наземного этапа")}
+        ${metric(hours(airborneMinutes(r.estimatedBackMin)),"в воздухе в VKO","оценка · без 25 мин наземного этапа")}
         ${metric(hours(r.estimatedRotationMin),"оборот VKO–X–VKO","старая оценка")}
         ${metric(`${r.timeOnlyWindowFits}/5`,"окон подходят по времени","OPS не проверено",true)}
       </div></div>
@@ -61,8 +64,8 @@
       <button class="detail-more" type="button" aria-expanded="false" aria-controls="detail-expanded">Все исходные показатели и риски ↓</button>
       <div class="detail-expanded" id="detail-expanded" hidden>
         ${pair("Расстояние от VKO · старый расчёт",`${fmt(r.oldDistanceKm)} км`)}
-        ${pair("Плечо туда · оценка",hours(r.estimatedOutMin))}
-        ${pair("Плечо обратно · оценка",hours(r.estimatedBackMin))}
+        ${pair("Плечо туда для расчёта оборота",hours(r.estimatedOutMin))}
+        ${pair("Плечо обратно для расчёта оборота",hours(r.estimatedBackMin))}
         ${pair("Стоянка в пункте · оценка",hours(r.estimatedTurnMin))}
         ${pair("Население города",fmt(r.cityPopulation))}
         ${pair("Население региона",fmt(r.regionalPopulation))}
@@ -105,7 +108,7 @@
       const selected = r.iata === state.selected;
       L.polyline([data.base.coords,r.coords],{color:selected?"#c91737":"#9ba5af",weight:selected?3:1.3,opacity:selected?.88:.42,dashArray:selected?null:"4 6",interactive:false}).addTo(layerGroup);
       const marker = L.marker(r.coords,{icon:pinIcon(r,selected),zIndexOffset:selected?1000:0}).addTo(layerGroup);
-      marker.bindTooltip(`${r.city} · ${r.iata}`,{direction:"top",offset:[0,-7]});
+      marker.bindTooltip(`${r.city} · ${r.iata} · ≈ ${hours(airborneMinutes(r.estimatedOutMin))} в воздухе из VKO`,{direction:"top",offset:[0,-7]});
       marker.on("click",() => selectRoute(r.iata,true));
       if (selected) activeLine = [data.base.coords,r.coords];
     }
