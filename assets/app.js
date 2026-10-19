@@ -22,7 +22,7 @@
     PEZ: {airline:"Россия", airports:"SVO", frequency:"6 вылетов 16–21.11", scope:"часть недели; 22.11 не проверено"},
   };
   const moscowAirportNames = {VKO:"Внуково (VKO)",SVO:"Шереметьево (SVO)",DME:"Домодедово (DME)",ZIA:"Жуковский (ZIA)"};
-  let map, layerGroup, activeLine, planeMarker, animationFrame, animationStart;
+  let map, layerGroup, activeLine, planeMarker, animationFrame, animationStart, planeOutbound = true;
 
   function esc(value) {
     return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]);
@@ -116,7 +116,20 @@
     more.addEventListener("click", () => { const expanded = detail.querySelector("#detail-expanded"); expanded.hidden = !expanded.hidden; more.setAttribute("aria-expanded", String(!expanded.hidden)); more.textContent = expanded.hidden ? "Все исходные показатели и риски ↓" : "Свернуть показатели ↑"; });
   }
   function airplaneSvg() {
-    return `<svg class="plane-glyph" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24 3c2 0 3 3 3 7v10l15 9v4l-15-4v9l5 4v3l-8-2-8 2v-3l5-4v-9L6 33v-4l15-9V10c0-4 1-7 3-7Z" fill="#f7f8f7" stroke="#a70f29" stroke-width="2"/><path d="M24 7v30" stroke="#c81936" stroke-width="2.5"/><path d="M12 29l12-6 12 6" stroke="#c49a54" stroke-width="1.5" fill="none"/><path d="M20 41h8" stroke="#c81936" stroke-width="2"/></svg>`;
+    return `<svg class="plane-glyph" viewBox="0 0 180 68" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M27 38 32 8 Q33 5 37 5 L45 6 48 38Z" fill="#c61938" stroke="#8f152a" stroke-width="1.5"/>
+      <path d="M37 10 Q43 17 49 18 M36 16 Q42 25 50 27 M36 23 Q42 31 49 34" fill="none" stroke="#e0b66d" stroke-width="2.3" stroke-linecap="round"/>
+      <path d="M18 14 48 14 54 18 16 20Z" fill="#f3f4f3" stroke="#9fa8ac" stroke-width="1.2"/>
+      <path d="M10 39 Q13 34 32 33 L145 32 Q161 32 170 38 Q174 41 170 44 Q166 47 151 48 L35 48 Q17 47 10 43Z" fill="#f8f9f8" stroke="#aab2b7" stroke-width="1.7"/>
+      <path d="M23 42 Q81 43 165 41" fill="none" stroke="#cda766" stroke-width="2.2"/>
+      <path d="M87 42 111 43 99 54 59 64 64 57Z" fill="#edf0f1" stroke="#a8b0b3" stroke-width="1.5"/>
+      <path d="M68 57 107 44" fill="none" stroke="#c2c8ca" stroke-width="1"/>
+      <path d="M24 39 41 38 Q52 38 54 43 L52 50 Q48 54 37 54 L24 50Z" fill="#c41a38" stroke="#8e152c" stroke-width="1.4"/>
+      <ellipse cx="52" cy="46" rx="5" ry="7" fill="#233342" stroke="#e3bb70" stroke-width="1.6"/>
+      <path d="M135 35 151 35 161 39 135 39Z" fill="#2f4251"/>
+      <g fill="#455665"><circle cx="65" cy="37" r="1.3"/><circle cx="71" cy="37" r="1.3"/><circle cx="77" cy="37" r="1.3"/><circle cx="83" cy="37" r="1.3"/><circle cx="89" cy="37" r="1.3"/><circle cx="95" cy="37" r="1.3"/><circle cx="101" cy="37" r="1.3"/><circle cx="107" cy="37" r="1.3"/></g>
+      <text x="105" y="44" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="-1" fill="#b71935">RusLine</text>
+    </svg>`;
   }
   function initializeMap() {
     if (!mapReady) { document.getElementById("map-fallback").hidden = false; return; }
@@ -149,7 +162,8 @@
     }
     L.marker(data.base.coords,{icon:L.divIcon({className:"",html:'<div class="vko-pin">VKO</div>',iconSize:[37,37],iconAnchor:[18.5,18.5]}),zIndexOffset:2000}).addTo(layerGroup).bindTooltip("Внуково · база RA-67143",{direction:"top"});
     if (activeLine && chosen) {
-      planeMarker = L.marker(data.base.coords,{icon:L.divIcon({className:"",html:airplaneSvg(),iconSize:[38,38],iconAnchor:[19,19]}),interactive:false,zIndexOffset:1500}).addTo(layerGroup);
+      planeOutbound = true;
+      planeMarker = L.marker(data.base.coords,{icon:L.divIcon({className:"",html:airplaneSvg(),iconSize:[112,43],iconAnchor:[56,21.5]}),interactive:false,zIndexOffset:1500}).addTo(layerGroup);
       animationStart = performance.now();
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) planeMarker.setLatLng([(data.base.coords[0]+chosen.coords[0])/2,(data.base.coords[1]+chosen.coords[1])/2]);
       else animationFrame = requestAnimationFrame(animatePlane);
@@ -159,21 +173,19 @@
   function orientPlane() {
     if (!map || !planeMarker || !activeLine) return;
     const a=map.latLngToContainerPoint(activeLine[0]), b=map.latLngToContainerPoint(activeLine[1]);
-    const angle=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI+90;
     const glyph=planeMarker.getElement()?.querySelector(".plane-glyph");
-    if (glyph) glyph.style.transform=`rotate(${angle}deg)`;
+    if (glyph) glyph.style.transform=`scaleX(${(b.x-a.x)*(planeOutbound?1:-1)>=0?1:-1})`;
   }
   function animatePlane(now) {
     if (!planeMarker || !activeLine) return;
     const phase=((now-animationStart)/14000)%1;
     const outward=phase<.5;
+    planeOutbound=outward;
     const t=outward?phase*2:(1-phase)*2;
     const ease=t*t*(3-2*t);
     const a=activeLine[0],b=activeLine[1];
     planeMarker.setLatLng([a[0]+(b[0]-a[0])*ease,a[1]+(b[1]-a[1])*ease]);
     orientPlane();
-    const glyph=planeMarker.getElement()?.querySelector(".plane-glyph");
-    if (glyph && !outward) glyph.style.transform += " rotate(180deg)";
     animationFrame=requestAnimationFrame(animatePlane);
   }
   function fitAll() {
