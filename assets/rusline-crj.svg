@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 210" role="img" aria-labelledby="title desc">
+  <title id="title">CRJ в окраске, близкой к RA-67143 авиакомпании РусЛайн</title>
+  <desc id="desc">Белый фюзеляж, красная надпись RusLine, тонкая золотая полоса, красные двигатели и красно-золотой рисунок на хвосте. Авторская векторная иллюстрация.</desc>
+  <defs>
+    <linearGradient id="fuselage" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#f3f5f5"/><stop offset="1" stop-color="#cbd0d1"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#c9ced0"/></linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ed263d"/><stop offset="1" stop-color="#a70f29"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#b9873c"/><stop offset=".55" stop-color="#e4bd73"/><stop offset="1" stop-color="#a77630"/></linearGradient>
+  </defs>
+  <ellipse cx="310" cy="192" rx="265" ry="10" fill="#050b14" opacity=".2"/>
+  <path d="M473 117 494 42 Q497 34 508 34 L531 34 535 119Z" fill="url(#red)" stroke="#8f1327" stroke-width="2"/>
+  <path d="M502 39 Q510 48 527 54 L529 62 Q516 59 505 52 Q514 65 529 69 L530 76 Q513 72 503 61 Q508 77 529 86 L529 92 Q504 84 498 66Z" fill="url(#gold)"/>
+  <path d="M31 127 Q30 118 49 113 Q71 106 105 105 L438 106 Q465 107 489 113 L559 119 Q574 122 579 129 Q577 139 559 142 L148 148 Q83 148 52 138Z" fill="url(#fuselage)" stroke="#a9afb1" stroke-width="2"/>
+  <path d="M38 126 Q110 133 231 132 L574 130" fill="none" stroke="url(#gold)" stroke-width="3.6"/>
+  <path d="M42 131 Q103 142 152 141 L555 137" fill="none" stroke="#bdc3c6" stroke-width="1.3" opacity=".8"/>
+  <path d="M73 111 Q86 106 105 107 L105 118 71 120Z M115 109 Q127 107 136 109 L137 118 115 119Z" fill="#253a4c" stroke="#d5dce0" stroke-width="1.2"/>
+  <g fill="#384a57">
+    <rect x="155" y="111" width="7" height="5" rx="2"/><rect x="170" y="111" width="7" height="5" rx="2"/><rect x="185" y="111" width="7" height="5" rx="2"/><rect x="200" y="111" width="7" height="5" rx="2"/><rect x="215" y="111" width="7" height="5" rx="2"/><rect x="230" y="111" width="7" height="5" rx="2"/><rect x="245" y="111" width="7" height="5" rx="2"/><rect x="260" y="111" width="7" height="5" rx="2"/><rect x="275" y="111" width="7" height="5" rx="2"/><rect x="290" y="111" width="7" height="5" rx="2"/><rect x="305" y="111" width="7" height="5" rx="2"/><rect x="320" y="111" width="7" height="5" rx="2"/><rect x="335" y="111" width="7" height="5" rx="2"/><rect x="350" y="111" width="7" height="5" rx="2"/><rect x="365" y="111" width="7" height="5" rx="2"/><rect x="380" y="111" width="7" height="5" rx="2"/><rect x="395" y="111" width="7" height="5" rx="2"/>
+  </g>
+  <path d="M281 130 367 133 339 158 241 185 Q230 187 236 178Z" fill="url(#wing)" stroke="#a4aaad" stroke-width="2"/>
+  <path d="M276 136 355 136 326 157 248 179" fill="none" stroke="#bdc2c4" stroke-width="1.5"/>
+  <path d="M449 120 495 121 543 162 526 164 469 145Z" fill="url(#wing)" stroke="#a4aaad" stroke-width="2"/>
+  <path d="M447 130 Q452 124 464 125 L487 127 Q500 129 501 139 Q499 151 481 155 L452 153 Q442 148 443 140Z" fill="url(#red)" stroke="#92152c" stroke-width="2"/>
+  <ellipse cx="450" cy="140" rx="10" ry="13" fill="#303842" stroke="#e1bd78" stroke-width="2"/>
+  <ellipse cx="450" cy="140" rx="5" ry="7" fill="#17202a"/>
+  <path d="M470 128 Q481 130 491 135" stroke="url(#gold)" stroke-width="3" fill="none"/>
+  <text x="195" y="137" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#bc1532" letter-spacing="-1.3">RusLine</text>
+  <text x="403" y="136" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#48505a">RA-67143</text>
+</svg>
