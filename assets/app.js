@@ -94,8 +94,10 @@
         ${metric(`${r.timeOnlyWindowFits}/5`,"окон подходят по времени","OPS не проверено",true)}
       </div></div>
       <div class="detail-section"><h4>Рейсы из Москвы по дням</h4><div class="weekly">${days.map((day,i) => `<div class="day ${r.moscowDailyOld[i] === 0 ? "zero" : ""}"><span class="day-label">${day}</span><span class="day-number">${fmt(r.moscowDailyOld[i])}</span></div>`).join("")}</div><p class="weekly-note">Исторический недельный срез 07.10.2026 для 16–22.11.2026; полнота и изменения требуют проверки.</p></div>
-      <div class="detail-section"><h4>Допустимый вылет из VKO · МСК</h4><div class="fit-rows">${r.windowFit.map((w,i)=>`<div class="fit-row"><b>${days[i]}</b><span>${compact(w.earliestDeparture)}–${compact(w.latestDeparture)}</span><strong>${fmt(w.departureRangeMin)} мин</strong></div>`).join("")}</div><p class="weekly-note">Диапазоны рассчитаны по старой оценке оборота и буферам 60/120 минут. Не подтверждают режим аэропорта, слоты и экипаж.</p></div>
-      <div class="detail-section"><h4>Что показывает модель</h4><p>${esc(r.oldWhy || "Кандидат старого исследования; причина выбора требует дополнительной рыночной оценки.")}</p>${pair("Баллы старого рейтинга",fmt(r.combined))}${pair("Самый узкий диапазон вылета",`${fmt(r.narrowestDepartureRangeMin)} мин`)}</div>
+      <details class="detail-operations"><summary>Окна борта и обоснование</summary>
+        <div class="detail-section"><h4>Допустимый вылет из VKO · МСК</h4><div class="fit-rows">${r.windowFit.map((w,i)=>`<div class="fit-row"><b>${days[i]}</b><span>${compact(w.earliestDeparture)}–${compact(w.latestDeparture)}</span><strong>${fmt(w.departureRangeMin)} мин</strong></div>`).join("")}</div><p class="weekly-note">Диапазоны рассчитаны по старой оценке оборота и буферам 60/120 минут. Не подтверждают режим аэропорта, слоты и экипаж.</p></div>
+        <div class="detail-section"><h4>Что показывает модель</h4><p>${esc(r.oldWhy || "Кандидат старого исследования; причина выбора требует дополнительной рыночной оценки.")}</p>${pair("Баллы старого рейтинга",fmt(r.combined))}${pair("Самый узкий диапазон вылета",`${fmt(r.narrowestDepartureRangeMin)} мин`)}</div>
+      </details>
       <button class="detail-more" type="button" aria-expanded="false" aria-controls="detail-expanded">Все исходные показатели и риски ↓</button>
       <div class="detail-expanded" id="detail-expanded" hidden>
         ${pair("Расстояние от VKO · старый расчёт",`${fmt(r.oldDistanceKm)} км`)}
